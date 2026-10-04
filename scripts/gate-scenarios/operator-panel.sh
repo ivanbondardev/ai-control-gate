@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Local synthetic operator fixtures; never calls a model provider.
+# Synthetic operator fixtures; never calls a model provider.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 mode="${1:-suite}"
 case "$mode" in suite|state) ;; *) echo 'Usage: operator-panel.sh [suite|state]' >&2; exit 2;; esac
 source "$here/common.sh"
-case "$GATE_BASE_URL" in http://localhost|http://localhost:*|http://127.0.0.1|http://127.0.0.1:*) ;; *) echo 'Local demo only' >&2; exit 2;; esac
+case "$GATE_BASE_URL" in https://ai-control-gate.ivbon.dev|http://localhost|http://localhost:*|http://127.0.0.1|http://127.0.0.1:*) ;; *) echo 'Only local demo or approved staging is supported' >&2; exit 2;; esac
 mkdir -p "$RESULT_DIR"
 http_request /v1/panel/state - "$RESULT_DIR/before" operator-local
 [[ "$CURL_EXIT" == 0 && "$HTTP_CODE" == 200 ]] || exit 2

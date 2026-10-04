@@ -11,8 +11,8 @@ Usage:
   OPENAI_MODEL=<enabled-model> run.sh --profile baseline
   run.sh --case M02
 
-Runs on the host with Bash, curl and Python; default Gate URL: http://localhost.
-Set GATE_BASE_URL=http://localhost:8080 if the Gate is published on another port.
+Runs on the host with Bash, curl and Python; default Gate URL: https://ai-control-gate.ivbon.dev.
+Set GATE_BASE_URL=http://localhost to explicitly use the local demo.
 Profiles are operator-prepared preconditions, not installed by this script.
 OPENAI_MODEL is required for model requests; provider key stays on Gate.
 Exit: 1 assertion failure; 2 blocked; 3 client checks observed, evidence pending.

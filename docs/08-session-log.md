@@ -119,3 +119,23 @@ The deployment record is committed and pushed, then the same deployment script i
 ## 2026-10-04 — staging detector settings update
 
 **Instruction:** reuse the three local detector provider settings on staging. Removed their forced-empty staging Compose overrides and updated the runbook. Transfer uses SSH into server-private configuration; verification compares the running container settings without printing values. Active detector policy/profile remains unchanged and no provider request is used for verification. Outcome follows below.
+
+### Outcome — staging detector configuration verified
+
+Deployed GitHub HEAD `fedbae7390fc6fc2e9dc861c15fc284d8e41dd4d` from a separate clean clone, as explicitly requested by the owner. All three detector provider settings in the running staging API exactly match the resolved local `.env` values; verification printed only MATCH status. All eight services are healthy and both origin/public HTTPS readiness checks passed. No provider request was made. The server environment backup remains private at `/opt/action-gate/shared/.env.staging.before-detector`.
+
+Concurrent architecture-review notes entered the first documentation commit; a follow-up commit removed them from the deployed HEAD while preserving their local working-file contents. `docs/architecture-review.md` itself was never added. The architecture work and this final verification note remain local; the deployment source checkout was clean.
+
+## 2026-10-04 — Bash client routing moved to staging
+
+**Done:** changed the shared scenario transport default to staging HTTPS, added private SSH synchronization of Gate client identities and origin-specific registry selection, enabled the staging origin for synthetic operator checks, and updated command help and scenario documentation. Localhost remains an explicit override. Parallel architecture-review work remains untouched.
+
+**Checks:** Bash syntax passed; all 53 fixtures validated offline; 14 existing assertion tests passed. Live staging preflight returned readiness and authenticated caller responses successfully. Credentials were downloaded into the ignored secrets directory with mode 600, without printing them. No model-provider request was issued. MCP smoke outcome is recorded below.
+
+**Outcome:** staging MCP case M02 (read synthetic document KB-1042) completed with `OBSERVED`, zero FAIL and zero BLOCKED. Client assertions passed; the suite correctly leaves independent service/audit correlation unverified. Evidence: `evidence/gate-scenarios/20261004T064649Z-76919-6505`. Additional checks passed for staging multi-principal selection, explicit localhost fallback, refusal to auto-select credentials for unknown origins and file permissions. These are client-only changes; no server deployment was required.
+
+## 2026-10-04 — commit and push staging Bash clients
+
+**Instruction:** commit and push the completed Bash scenario routing changes. Scope includes the staging client transport, credential synchronization, usage documentation and related staging verification notes. Architecture-review files and their documentation sections remain outside this commit, preserving the owner's earlier exclusion.
+
+**Checks:** reviewed the diff and confirmed the staging credential file is ignored. Prior offline fixture/assertion checks and live preflight/M02 results are recorded above; no repeated provider calls or server deployment are needed for this client-only publication. Staged whitespace validation passed.

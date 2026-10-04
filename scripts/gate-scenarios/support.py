@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 CASES = json.loads((HERE / 'cases.json').read_text())
@@ -25,7 +26,16 @@ def credentials(principal):
     override = os.environ.get('GATE_TOKEN') if principal == os.environ.get('GATE_PRINCIPAL', 'support-agent') else None
     if override:
         return override
-    registry = json.loads((HERE.parents[1] / 'app/policy/principals.json').read_text())
+    base = os.environ.get('GATE_BASE_URL', 'https://ai-control-gate.ivbon.dev').rstrip('/')
+    if base == 'https://ai-control-gate.ivbon.dev':
+        path = HERE.parents[1] / 'secrets/staging-client/principals.json'
+        if not path.is_file():
+            raise ValueError('Missing staging client credentials; run sync-staging-auth.sh')
+    elif urlsplit(base).hostname in ('localhost', '127.0.0.1', 'ai-control-proxy.localhost'):
+        path = HERE.parents[1] / 'app/policy/principals.json'
+    else:
+        raise ValueError('Explicit GATE_TOKEN required for this Gate origin')
+    registry = json.loads(path.read_text())
     return next(p['token'] for p in registry['principals'] if p['id'] == principal)
 
 

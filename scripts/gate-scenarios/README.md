@@ -2,7 +2,7 @@
 
 **Suite implementation fact:** 53 scenario descriptions in `cases.json`, 39 OpenAI Responses JSON templates, a Bash transport via `curl`, separate scripts for the agent loop, retry, concurrent budget and reporting export. This is a client test suite; it does not implement the model proxy.
 
-**Owner decision fact:** the format and the real provider are OpenAI by default; we do not create an LLM emulator. [Instruction](../../sources/openai-request-format-decision-2026-10-04.md). The provider key is configured **on the Gate**; client scripts neither read it nor forward it. `GATE_TOKEN` is a separate client identity; by default a synthetic token from the local registry is used.
+**Owner decision fact:** the format and the real provider are OpenAI by default; we do not create an LLM emulator. [Instruction](../../sources/openai-request-format-decision-2026-10-04.md). The provider key is configured **on the Gate**; client scripts neither read it nor forward it. `GATE_TOKEN` is a separate client identity; by default a staging token from the ignored client registry is used.
 
 **Implementation fact:** `/v1/responses` supports a limited OpenAI Responses profile, function calling and buffered SSE. [Contract](../../app/contracts/model-proxy.md), [live evidence and boundaries](../../sources/model-proxy-implementation-2026-10-04.md). The full set of 53 scenarios under all policy profiles has not yet been confirmed.
 
@@ -10,10 +10,11 @@ The status of each ID, historical results and the boundaries of the copy check a
 
 ## Running from a local terminal
 
-**Implementation fact:** the scripts run on your computer, outside containers. The typical address is `http://localhost` (port 80); `http://127.0.0.1` is also supported. Traefik routes both addresses to the Gate. Requests to loopback bypass the system HTTP proxy. Docker is needed for the server stack, but the client scripts do not call Docker and do not require `docker exec`.
+**Implementation fact:** the scripts run on your computer, outside containers. The default address is `https://ai-control-gate.ivbon.dev`. For the local demo, explicitly set `GATE_BASE_URL=http://localhost`; `http://127.0.0.1` is also supported. Requests to loopback bypass the system HTTP proxy. Docker is needed for the server stack, but the client scripts do not call Docker and do not require `docker exec`.
 
 ```bash
-# Run from the repository root
+# Run from the repository root; sync Gate tokens once or after token rotation.
+./scripts/gate-scenarios/sync-staging-auth.sh
 ./scripts/gate-scenarios/preflight.sh
 ./scripts/gate-scenarios/run.sh --case M02
 
@@ -24,7 +25,7 @@ GATE_BASE_URL=http://localhost:8080 ./scripts/gate-scenarios/preflight.sh
 ./scripts/gate-scenarios/run.sh --list
 ```
 
-**Prerequisite:** the server stack is already running and the port matches `TRAEFIK_HTTP_PORT` in the server configuration. `GATE_BASE_URL` changes only the client address, not the server port. MCP requires running MCP services and a published catalog. The model route `/v1/responses` is implemented; the OpenAI key and the allowed model are configured on the server.
+**Prerequisite:** the selected server stack is already running. Staging client credentials are stored in `secrets/staging-client/principals.json` (gitignored, mode 600). Only the exact staging HTTPS origin can use this registry automatically. No provider credentials are downloaded. `GATE_BASE_URL` changes only the client address, not the server port. MCP requires running MCP services and a published catalog. The model route `/v1/responses` is implemented; the OpenAI key and the allowed model are configured on the server.
 
 ## Scenario commands
 
@@ -54,10 +55,10 @@ OPENAI_REASONING_EFFORT=minimal ./scripts/gate-scenarios/agent-loop.sh KB-1042
 
 | Variable | Purpose |
 |---|---|
-| `GATE_BASE_URL` | Default `http://localhost`; the Gate root without `/v1` |
+| `GATE_BASE_URL` | Default `https://ai-control-gate.ivbon.dev`; the Gate root without `/v1` |
 | `OPENAI_MODEL` | The real allowed model for generation; required for model scenarios, except malformed JSON |
 | `GATE_PRINCIPAL` | Default `support-agent` |
-| `GATE_TOKEN` | The token of this principal; if absent — the local synthetic registry |
+| `GATE_TOKEN` | The token of this principal; if absent — the staging client registry, or synthetic registry for explicit localhost |
 | `RESULT_DIR` | A new, empty evidence directory; by default in the gitignored `evidence/gate-scenarios/…` |
 | `REQUEST_TIMEOUT_SECONDS` | Client timeout, default 60 s; this is not evidence of the server time budget |
 | `REPORT_PRINCIPAL` | Default `operator-local`; for own-scope `support-agent` is also possible |
@@ -137,7 +138,7 @@ Before submission, the following must be closed separately: reset/reconcile/fenc
 
 ### Manual panel operator scenarios
 
-**Implementation fact:** `operator-panel.sh` complements the browser check with local
+**Implementation fact:** `operator-panel.sh` complements the browser check with staging or local
 synthetic invocations of `/v1/panel/invoke`. It does not call OpenAI and does not change
 policies. The policy is prepared in the browser. The results of this run and the
 boundaries — the operator report (archive reference: `../../sources/operator-manual-report-2026-10-04.md`).

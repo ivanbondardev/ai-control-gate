@@ -70,3 +70,9 @@ along with the infrastructure, scripts, the primary task and the selected contex
 **Owner instruction:** use the local `DETECTOR_PROVIDER_BASE_URL`, `DETECTOR_PROVIDER_API_KEY` and `DETECTOR_PROVIDER_MODEL` on staging.
 
 **Decision:** remove the staging Compose overrides that forced those three settings empty, and transfer their resolved local values over the authorized SSH connection into the private server `.env.staging`. Values and secrets are not written to tracked files or logs. This is configuration authorization; verification does not issue paid provider requests or change the active detector policy/profile.
+
+## 2026-10-04 — Bash scenarios target staging
+
+**Owner instruction:** redirect the Bash test requests from localhost to staging.
+
+**Implementation:** the gate-scenarios scripts default to `https://ai-control-gate.ivbon.dev`; explicit `GATE_BASE_URL=http://localhost` still selects the local demo. Staging client identity tokens are fetched over SSH into ignored mode-600 `secrets/staging-client/principals.json`. Automatic use is restricted to the exact staging HTTPS origin. Provider credentials stay on the server. The synthetic operator script also accepts the approved staging origin. No full model suite or paid request is implied by the routing change.

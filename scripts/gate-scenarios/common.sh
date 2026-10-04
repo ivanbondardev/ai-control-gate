@@ -4,10 +4,10 @@ set -euo pipefail
 umask 077
 SCENARIO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCENARIO_DIR/../.." && pwd)"
-GATE_BASE_URL="${GATE_BASE_URL:-http://localhost}"
+GATE_BASE_URL="${GATE_BASE_URL:-https://ai-control-gate.ivbon.dev}"
 GATE_BASE_URL="${GATE_BASE_URL%/}"
 GATE_PRINCIPAL="${GATE_PRINCIPAL:-support-agent}"
-export GATE_PRINCIPAL
+export GATE_PRINCIPAL GATE_BASE_URL
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$-${RANDOM}"
 RESULT_DIR="${RESULT_DIR:-$REPO_ROOT/evidence/gate-scenarios/$RUN_ID}"
 if [[ -d "$RESULT_DIR" ]] && [[ -n "$(ls -A "$RESULT_DIR")" ]]; then
