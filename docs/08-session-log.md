@@ -99,3 +99,7 @@ Details and boundaries are in [transfer](transfer.md).
 **Instruction:** commit and push local changes, then deploy staging.
 
 **Preflight facts:** SSH reached `it-nomads-server` at the approved address; Docker context is `default`, Compose is 2.40.3, no Compose projects are running, TCP ports 80/443 are free and approximately 34 GB of disk is available. Five deployment guard tests, Bash syntax and `git diff --check` passed. `.env` and `secrets/` are not tracked. Deployment outcome will be appended after the run.
+
+### Deployment retry — shared image build
+
+The first authorized deployment of `c506084` reached the server and generated staging configuration, but stopped during BuildKit image export: multiple services exporting the shared `action-gate-api:0.2.0` tag raced (`image already exists`). Changed the staging wrapper to build the API image once and start all services with `--no-build`. No data reset or credential regeneration is needed. Bash syntax passed; the fix is committed and pushed before retrying through the same GitHub-HEAD deployment guard.

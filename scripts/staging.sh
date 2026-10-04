@@ -16,7 +16,9 @@ case "${1:-config}" in
     config) "${compose[@]}" config --quiet ;;
     up)
         "${compose[@]}" config --quiet
-        "${compose[@]}" up -d --build --wait
+        # All application services share one image; concurrent exporters can race on its tag.
+        "${compose[@]}" build api
+        "${compose[@]}" up -d --no-build --wait
         "${compose[@]}" ps
         ;;
     bootstrap)
