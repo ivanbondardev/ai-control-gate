@@ -107,3 +107,11 @@ The first authorized deployment of `c506084` reached the server and generated st
 ### Deployment retry — SSH script input isolation
 
 The `a8b3567` release started all eight services healthy and completed bootstrap; direct origin HTTPS readiness passed with certificate validation. The SSH invocation exited without creating the final deployment marker. The remote script had been streamed on stdin shared with child commands. Changed the orchestrator to pass the verified remote script as a quoted `bash -c` argument and close stdin, preventing Compose/child commands from consuming the remaining deployment script. Existing credentials, data and bootstrap marker are retained on retry. A transient GitHub "repository disabled" response cleared on a read-only retry; GitHub then advertised the expected HEAD.
+
+### Successful staging deployment and public checks
+
+Release `bdb3ecc7e83c785020eb1402bdb831b91b8e786e` completed deployment through the GitHub-HEAD guard. All eight long-running services are healthy; migrations succeeded and bootstrap completed. Direct-origin HTTPS certificate validation and public Cloudflare readiness both passed. Public panel returned HTTP 200; anonymous panel API and MCP returned 401; the known local development operator token returned 401; the generated staging operator token returned 200; authenticated MCP initialization returned 200. Tokens were not printed or copied into the repository.
+
+Automatic approval review initially rejected public authenticated checks because of token transmission through Cloudflare. The owner explicitly approved this check, after which it completed successfully. No provider/model calls were made. Bootstrap reported the existing labelled baseline mismatch `t10`, with no new failures; this is not a claim of perfect semantic classification. Full browser interaction coverage, load and backup restoration remain unverified.
+
+The deployment record is committed and pushed, then the same deployment script is run again so staging follows the final documentation-inclusive GitHub HEAD. Existing secrets, volumes and bootstrap state are retained.

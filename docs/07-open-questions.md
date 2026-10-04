@@ -92,3 +92,7 @@ The primary Goldman task documents arrived on 2026-10-03 and are in [../sources/
 - Resolved email: the owner supplied `ivan.bondar.dev@gmail.com`; it is now the deploy script's default ACME contact.
 - DNS configuration evidence: the supplied screenshot shows the requested hostname's A record at `95.217.5.223`, with Cloudflare proxy enabled. This resolves the question of the intended record configuration; public reachability is still unverified.
 - Still unverified: Cloudflare SSL/TLS mode (Full strict is required by the runbook), challenge-path rules and origin port reachability. The screenshot does not expose these settings.
+
+### Follow-up — staging deployed and verified
+
+The owner authorized commit, push, deployment and authenticated checks. Origin TLS, public Cloudflare HTTPS readiness, panel API authentication and MCP initialization passed on 2026-10-04. The DNS/reachability deployment prerequisite is satisfied. The Cloudflare dashboard's configured SSL mode was not directly inspected, although both HTTPS paths work. Load and backup/restore verification remain pending.
