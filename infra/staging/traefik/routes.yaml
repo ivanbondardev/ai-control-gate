@@ -1,0 +1,24 @@
+http:
+  routers:
+    action-gate:
+      entryPoints: [websecure]
+      rule: 'Host(`{{ env "APP_HOST" }}`)'
+      service: action-gate-api
+      tls:
+        certResolver: letsencrypt
+    action-gate-mcp:
+      entryPoints: [websecure]
+      rule: 'Host(`{{ env "APP_HOST" }}`) && Path(`/mcp`)'
+      priority: 100
+      service: action-gate-mcp
+      tls:
+        certResolver: letsencrypt
+  services:
+    action-gate-api:
+      loadBalancer:
+        servers:
+          - url: 'http://api:{{ env "APP_PORT" }}'
+    action-gate-mcp:
+      loadBalancer:
+        servers:
+          - url: 'http://gate-mcp:{{ env "APP_MCP_PORT" }}'

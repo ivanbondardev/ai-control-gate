@@ -54,6 +54,12 @@ configuration; see [the model proxy contract](app/contracts/model-proxy.md).
 Existing policies, audit history and service state from the old database are not
 included. Files provide bootstrap defaults, not a dump of the previous live demo.
 
+## Staging deployment
+
+Target: `https://ai-control-gate.ivbon.dev`. See [the staging runbook](docs/staging.md).
+`python3 scripts/deploy-staging.py --check` verifies a clean checkout matching GitHub
+default-branch HEAD. The deploy script uses SSH and never packages uncommitted work.
+
 ## Project map
 
 - [Complete documentation map](docs/00-documentation-map.md) and [cleanup record](docs/09-documentation-cleanup.md).

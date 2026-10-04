@@ -74,3 +74,21 @@ The primary Goldman task documents arrived on 2026-10-03 and are in [../sources/
 ## 2026-10-04 — invocation heading question closed
 
 **Source fact:** the [contracts index](../app/contracts/README.md) explicitly defines versioning the contracts together with release 0.2.0; [VERSION](../VERSION) and the [application module](../app/action_gate/__init__.py) contain 0.2.0. Hence the 0.1.0 heading was outdated relative to the documented scope. It has been replaced with `Release scope: 0.2.0`, without any API change or declaration of a separate version. The question from the previous inventory is closed.
+
+## 2026-10-04 — server preparation follow-up
+
+- Pending owner approval: switch SSH to key-only access and enable UFW with TCP 22 allowed. Automatic approval review rejected the bundled security changes due to lockout/disruption risk; the narrower dependency installation succeeded.
+- Before public deployment: decide the hostname and TLS/access configuration. The current Compose file binds HTTP to loopback and uses synthetic local operator credentials; it is not an approved public deployment configuration.
+- **Proposal, medium confidence:** consider swap or additional RAM after measuring the complete stack. The instance has approximately 2 GB RAM and no swap; no application load test has been run.
+
+## 2026-10-04 — staging first-deployment inputs
+
+- Which operator-controlled contact email should be passed to `deploy-staging.py --email` for ACME? No email was supplied or invented.
+- Has `ai-control-gate.ivbon.dev` been pointed to `95.217.5.223`, with public TCP 80/443 reachable and no incompatible AAAA record? DNS and public reachability have not been verified in the preparation session.
+- The checkout currently contains uncommitted changes, including staging preparation and earlier documentation edits. Deployment intentionally requires their review, commit and push before it can proceed.
+
+### Follow-up — owner supplied email and Cloudflare DNS
+
+- Resolved email: the owner supplied `ivan.bondar.dev@gmail.com`; it is now the deploy script's default ACME contact.
+- DNS configuration evidence: the supplied screenshot shows the requested hostname's A record at `95.217.5.223`, with Cloudflare proxy enabled. This resolves the question of the intended record configuration; public reachability is still unverified.
+- Still unverified: Cloudflare SSL/TLS mode (Full strict is required by the runbook), challenge-path rules and origin port reachability. The screenshot does not expose these settings.

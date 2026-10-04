@@ -47,3 +47,55 @@ Details and boundaries are in [transfer](transfer.md).
 **Checks:** every translated file was compared against the pre-translation copy for line count, headings, tables, code spans and link targets; the Markdown link check reports 0 broken links in 45 files, the same as before the translation. A full-repository Cyrillic scan is clean apart from the intentional cases above. Code, configuration, SQL, runtime and the Compose stack were not touched; no commits were made.
 
 **Unverified:** the quality of the translation as judged by a native reviewer; anchors and external URLs; the runtime of the stack, the UI and real model invocations. The pre-translation originals are kept at `.translation-backup/uk-originals-2026-10-04.tar.gz` (not part of the documentation set).
+
+## 2026-10-04 — remote deployment prerequisites
+
+**Fact of the instruction:** prepare the fresh instance at `95.217.5.223` using the owner's supplied SSH key path. Source evidence: direct SSH inspection and command output from this session.
+
+**Done:** inspected host `it-nomads-server` (Ubuntu 26.04.1 LTS, x86_64, approximately 2 GB RAM, no swap); installed Docker 29.1.3, Compose 2.40.3, Buildx 0.30.1, Make and jq, and ensured Git, rsync, curl and CA certificates are present. Enabled and started Docker; created `/opt/action-gate`. Available disk after installation: approximately 34 GB. No application source, private key, provider credentials or database state was transferred.
+
+**Decision:** prepare prerequisites only; retain the project separation and loopback HTTP binding. Automatic approval review rejected the combined OS/security command before execution; a narrower dependency installation completed. Requested separate approval for SSH/firewall changes. SSH, UFW, swap, daemon log settings and automatic-update configuration remain unchanged; no full OS upgrade was performed.
+
+**Checks:** fresh SSH connections succeeded; Docker is active and enabled; registry pull and `hello-world` execution passed with no container network and no published ports, and the temporary container was removed. The project's Compose template, including the demo profile, passed `config --quiet` in a temporary server directory that was subsequently removed. No failed systemd units or reboot-required marker were reported. Before the Docker smoke test, the daemon had no containers and HTTP/HTTPS ports were unused.
+
+**Unverified:** application build/start, migrations, integration/UI/MCP acceptance, sustained memory use, public DNS/TLS, backup/restore and real model calls. UFW was inactive and SSH password authentication enabled at inspection; root password login was already prohibited. Public deployment remains a separate task.
+
+## 2026-10-04 — first local runtime verification
+
+**Fact of the instruction:** perform the first local test launch; the owner explicitly requested port 80 and the previous project name after stopping the old stack.
+
+**Done:** built and bootstrapped this workspace as `ai-control-proxy` on `127.0.0.1:80`; migrations completed, all eight long-running services reported healthy, and `/health/ready` returned ready with PostgreSQL and Redis available. Opened `http://ai-control-proxy.localhost/control/` and verified operator login and live policy v2 in the browser. Left the application running and the panel open.
+
+**Decision:** use fresh `action-gate-export-first-run-*` volumes and the ignored `compose.first-run.local` override; archived `ai-control-proxy_*` volumes were not reset. Existing `.env` was preserved; provider settings are overridden to empty in the running API. The repeat-launch command and the reason to retain the overrides are recorded in [decisions](01-decision.md).
+
+**Checks:** host suite: 296 tests, 224 passed and 72 skipped; container suite: all 296 passed, no skips; PostgreSQL integration: 21 passed in a dedicated scratch database; HTTP acceptance: 145 passed, 0 failed. MCP acceptance completed with no failed phase, including service receipt correlation, lost-response reconciliation, restart persistence, fencing, reset and rate refusal. It ran in its own temporary project with random loopback port, no external providers and separate volumes; its containers, networks and volumes were removed automatically. Initial sandboxed host tests could not open sockets; the rerun with local socket access passed. `git diff --check` passed.
+
+**Evidence:** local ignored logs in `evidence/first-local-run-2026-10-04/`; MCP phase JSON and service snapshots in the `evidence/demo-mcp-*` directory named in the saved MCP log. Source tests: `app/tests/`, `scripts/acceptance.sh`, `scripts/demo-mcp-test.sh`. No code changes were required.
+
+**Unverified:** real provider calls (intentionally disabled), full browser interaction coverage, sustained load, public deployment and backup/restore. Browser verification covered panel loading and operator connection only.
+
+## 2026-10-04 — staging deployment scripts prepared
+
+**Instruction:** prepare staging for `ai-control-gate.ivbon.dev`, using SSH key `~/.ssh/grisha_htz_id_ed25519` and target `root@95.217.5.223`; deploy remote GitHub HEAD only after checking local changes are committed and pushed.
+
+**Done:** added `compose.staging.yaml`, hostname-specific Traefik HTTPS routes, server-local secret initialization, explicit staging Compose wrapper, SSH deployment orchestrator and remote deployment script. Git verification rejects dirty/untracked files, mismatched local/remote commits, a different branch and a remote HEAD race. The archive and remote script come from the verified commit. Added deployment lock, release directories, shared secrets, first-run-only bootstrap, strict host-key checks and public HTTPS postchecks. Added [staging runbook](staging.md) and README navigation. No local secrets are included in the deployment source paths.
+
+**Decisions:** default branch HEAD is resolved from GitHub rather than assumed to be main. Staging uses a separate project and persistent data, random tokens instead of fixture tokens, and disabled external model providers. No automatic commit/push, data reset or database rollback. The earlier working-tree packaging draft was replaced by the Git-only SSH workflow.
+
+**Checks:** Bash syntax passed; five offline deployment guard tests passed; real `--check` correctly refused the current dirty checkout before any network/SSH action. Temporary secret-generation checks verified distinct random tokens, private environment-file permissions and refusal to overwrite existing configuration. Docker Compose rendered successfully without starting containers; assertions verified ports 80/443 only on Traefik, correct secret/policy mounts, separate staging project and empty external provider settings. `git diff --check` passed. Official Docker merge and Traefik documentation were consulted and linked in the runbook.
+
+**Unverified:** clean-checkout live GitHub verification and SSH deployment end to end, server DNS/firewall/ports, live TLS issuance, authenticated public API/MCP behavior, and backup recovery. No server connection or mutation, certificate request, commit or push was performed. ACME email and DNS readiness remain open questions. The previous local stack was not changed.
+
+## 2026-10-04 — supplied staging contact and DNS evidence applied
+
+**Done:** set the owner's email `ivan.bondar.dev@gmail.com` as the default ACME contact. Recorded the screenshot's proxied A record to `95.217.5.223`. Updated the runbook for Cloudflare Full (strict), HTTP-01 challenge routing and independent origin/edge verification. Enhanced deployment postchecks to validate the origin certificate via loopback with hostname/SNI and require JSON readiness on both routes.
+
+**Checks:** Bash syntax, Python compilation and the five deployment guard tests passed; `git diff --check` passed. Documentation guidance was checked against official Cloudflare documentation. The dirty-checkout guard remains in force.
+
+**Unverified:** origin/public network reachability, Cloudflare TLS mode/rules, certificate issuance and deployment. No server or Cloudflare mutation, commit or push was performed.
+
+## 2026-10-04 — authorized commit, push and staging deployment started
+
+**Instruction:** commit and push local changes, then deploy staging.
+
+**Preflight facts:** SSH reached `it-nomads-server` at the approved address; Docker context is `default`, Compose is 2.40.3, no Compose projects are running, TCP ports 80/443 are free and approximately 34 GB of disk is available. Five deployment guard tests, Bash syntax and `git diff --check` passed. `.env` and `secrets/` are not tracked. Deployment outcome will be appended after the run.

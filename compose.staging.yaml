@@ -1,0 +1,50 @@
+# Use only through scripts/staging.sh (explicit env file and project name).
+services:
+  traefik:
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?Set ACME_EMAIL in .env.staging}
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --ping=true
+      - --log.level=INFO
+      - --global.checknewversion=false
+      - --global.sendanonymoususage=false
+    ports: !override
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/staging/traefik:/etc/traefik/dynamic:ro
+      - staging_acme:/acme
+  api:
+    environment:
+      DETECTOR_PROVIDER_BASE_URL: ""
+      DETECTOR_PROVIDER_API_KEY: ""
+      DETECTOR_PROVIDER_MODEL: ""
+      OPENAI_API_KEY: ""
+      MODEL_PROXY_DETECTOR_PROFILE: ""
+    volumes:
+      - ./secrets/staging:/run/demo:ro
+      - ./secrets/staging/principals.json:/app/policy/principals.json:ro
+  gate-mcp:
+    environment:
+      DEMO_MCP_ENDPOINT: http://gate-mcp:8010/mcp
+    volumes:
+      - ./secrets/staging:/run/demo:ro
+      - ./secrets/staging/principals.json:/app/policy/principals.json:ro
+  documents-mcp:
+    volumes:
+      - ./secrets/staging:/run/demo:ro
+  outbox-mcp:
+    volumes:
+      - ./secrets/staging:/run/demo:ro
+  tickets-mcp:
+    volumes:
+      - ./secrets/staging:/run/demo:ro
+volumes:
+  staging_acme:

@@ -4,6 +4,8 @@ Updated after cleanup on 2026-10-04. The workspace holds 50 documentation files:
 
 Three pitch drafts have been moved to a dated archive; the working references have been updated. The status "keep" denotes the document's role, not a fresh runtime confirmation. Completed C01–C10 are in the [cleanup report](09-documentation-cleanup.md).
 
+Staging deployment preparation: [SSH deployment runbook](staging.md) (added after the inventory below).
+
 ## Reading order
 
 1. [Main README](../README.md) → [working rules](../AGENTS.md) → [transfer boundaries](transfer.md).
