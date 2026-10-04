@@ -65,14 +65,6 @@ along with the infrastructure, scripts, the primary task and the selected contex
 
 **Direct instruction:** commit and push the local changes, then perform the staging deployment. This authorizes publication of the reviewed repository changes and the application deployment through the prepared SSH script. Existing restrictions on real provider calls, partner integrations and spending remain in force.
 
-## 2026-10-04 — architecture review document
-
-**Owner instruction:** create an architecture review in a separate file and follow ASD-STE100 as closely as possible.
-
-**Documentation decision:** keep the English review in [architecture-review.md](architecture-review.md). Use current source code and contracts as evidence. Separate risk hypotheses and proposals from implementation facts. State the limits of the language and runtime checks.
-
-**Boundary:** this is a documentation decision. The review does not approve a new product direction, policy unification, storage redesign, or deployment.
-
 ## 2026-10-04 — staging detector provider configuration
 
 **Owner instruction:** use the local `DETECTOR_PROVIDER_BASE_URL`, `DETECTOR_PROVIDER_API_KEY` and `DETECTOR_PROVIDER_MODEL` on staging.
