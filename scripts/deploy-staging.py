@@ -77,8 +77,9 @@ def main():
             str(archive), TARGET + ':' + remote_archive)
     # The remote deploy logic also comes from the verified commit, never a working-tree file.
     script = run('git', 'show', sha + ':scripts/staging-remote.sh', capture=True)
-    command = 'bash -s -- ' + shlex.quote(sha) + ' ' + shlex.quote(args.email or '')
-    run(*ssh, command, input=script + '\n')
+    # Pass code as an argument: Compose exec must not consume the shell's script stdin.
+    command = 'bash -c ' + shlex.quote(script) + ' -- ' + shlex.quote(sha) + ' ' + shlex.quote(args.email or '')
+    run(*ssh, command, stdin=subprocess.DEVNULL)
 
 
 if __name__ == '__main__':

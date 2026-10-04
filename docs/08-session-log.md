@@ -103,3 +103,7 @@ Details and boundaries are in [transfer](transfer.md).
 ### Deployment retry — shared image build
 
 The first authorized deployment of `c506084` reached the server and generated staging configuration, but stopped during BuildKit image export: multiple services exporting the shared `action-gate-api:0.2.0` tag raced (`image already exists`). Changed the staging wrapper to build the API image once and start all services with `--no-build`. No data reset or credential regeneration is needed. Bash syntax passed; the fix is committed and pushed before retrying through the same GitHub-HEAD deployment guard.
+
+### Deployment retry — SSH script input isolation
+
+The `a8b3567` release started all eight services healthy and completed bootstrap; direct origin HTTPS readiness passed with certificate validation. The SSH invocation exited without creating the final deployment marker. The remote script had been streamed on stdin shared with child commands. Changed the orchestrator to pass the verified remote script as a quoted `bash -c` argument and close stdin, preventing Compose/child commands from consuming the remaining deployment script. Existing credentials, data and bootstrap marker are retained on retry. A transient GitHub "repository disabled" response cleared on a read-only retry; GitHub then advertised the expected HEAD.
