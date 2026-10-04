@@ -96,8 +96,13 @@ with a newly initialized staging database. MCP endpoint:
 
 The wrapper pins project `action-gate-staging`, both Compose files and `.env.staging`;
 it clears inherited environment overrides. Always use this wrapper for staging.
-External model providers are explicitly disabled. Dummy Documents, Outbox and Tickets
-are synthetic; no real partner integration is configured.
+Detector provider URL, API key and model are read from the server-only `.env.staging`.
+On 2026-10-04 the owner authorized using the same three values as the local `.env`.
+Fresh initialization still leaves them empty; never commit provider credentials.
+This configuration does not switch the active detector policy away from its existing
+profile. `MODEL_PROXY_DETECTOR_PROFILE` and the separate `OPENAI_API_KEY` remain empty;
+the model proxy code can fall back to the detector key. Dummy Documents, Outbox and
+Tickets remain synthetic.
 
 ## Verify and operate
 

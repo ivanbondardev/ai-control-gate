@@ -115,3 +115,17 @@ Release `bdb3ecc7e83c785020eb1402bdb831b91b8e786e` completed deployment through 
 Automatic approval review initially rejected public authenticated checks because of token transmission through Cloudflare. The owner explicitly approved this check, after which it completed successfully. No provider/model calls were made. Bootstrap reported the existing labelled baseline mismatch `t10`, with no new failures; this is not a claim of perfect semantic classification. Full browser interaction coverage, load and backup restoration remain unverified.
 
 The deployment record is committed and pushed, then the same deployment script is run again so staging follows the final documentation-inclusive GitHub HEAD. Existing secrets, volumes and bootstrap state are retained.
+
+## 2026-10-04 — static architecture review
+
+**Work:** read the entry documents, implementation modules, contracts, SQL structure, and deployment configuration. Added [architecture-review.md](architecture-review.md) with a component diagram, four execution paths, policy ownership, data boundaries, failure behavior, and architectural assessments. Added a navigation link and recorded follow-up questions.
+
+**Decisions:** keep the review in English and follow ASD-STE100 principles as closely as practical. Label facts, risk hypotheses, proposals, and confidence. No implementation proposal was approved or applied.
+
+**Checks:** local links in the review resolve. An approximate prose check found no descriptive sentence above 25 words. Reviewed paragraph length and terminology. Documentation whitespace checks passed. No application code changed.
+
+**Unverified:** complete ASD-STE100 dictionary compliance; direct official source retrieval returned HTTP 403, although search exposed relevant rules. No new application tests, container actions, provider calls, live deployment checks, or load measurements ran. Historical verification remains separate. The Mermaid diagram was checked as source, not in a rendered preview.
+
+## 2026-10-04 — staging detector settings update
+
+**Instruction:** reuse the three local detector provider settings on staging. Removed their forced-empty staging Compose overrides and updated the runbook. Transfer uses SSH into server-private configuration; verification compares the running container settings without printing values. Active detector policy/profile remains unchanged and no provider request is used for verification. Outcome follows below.

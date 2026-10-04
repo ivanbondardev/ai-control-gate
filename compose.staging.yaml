@@ -23,9 +23,6 @@ services:
       - staging_acme:/acme
   api:
     environment:
-      DETECTOR_PROVIDER_BASE_URL: ""
-      DETECTOR_PROVIDER_API_KEY: ""
-      DETECTOR_PROVIDER_MODEL: ""
       OPENAI_API_KEY: ""
       MODEL_PROXY_DETECTOR_PROFILE: ""
     volumes:
