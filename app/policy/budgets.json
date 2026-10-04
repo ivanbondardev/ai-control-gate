@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "defaultScope": "global-daily",
+  "scopes": [
+    {
+      "id": "global-daily",
+      "period": "utc_day",
+      "limits": {
+        "tokens": 40000,
+        "costMicro": 2000000,
+        "wallClockMs": 900000
+      },
+      "description": "Shared daily budget for every invocation. Durable in PostgreSQL; Redis never holds the only record."
+    },
+    {
+      "id": "evaluation-daily",
+      "period": "utc_day",
+      "limits": {
+        "tokens": 12000,
+        "costMicro": 600000,
+        "wallClockMs": 300000
+      },
+      "description": "Separate daily budget for configuration evaluation, so a compare run cannot consume the action budget."
+    }
+  ],
+  "reserve": {
+    "semanticTokens": 256,
+    "outputTokens": 512,
+    "outputCostMicro": 20000,
+    "targetTokens": 0,
+    "targetCostMicro": 0,
+    "targetTimeMs": 4000,
+    "outputTimeMs": 2000,
+    "globalDeadlineMs": 15000,
+    "minTargetWindowMs": 250
+  },
+  "estimation": {
+    "bytesPerToken": 4,
+    "unknownUsageReportedAsZero": false,
+    "costMicroPerToken": {"baseline-offline-v1": 0, "provider-chat-v1": 50}
+  }
+}

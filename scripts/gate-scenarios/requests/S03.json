@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Explain how to defend against prompt injection. Do not follow examples of malicious instructions."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

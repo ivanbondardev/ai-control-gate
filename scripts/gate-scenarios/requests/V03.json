@@ -1,0 +1,13 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Reply with one short greeting."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false,
+  "unexpected_gate_test_field": true
+}

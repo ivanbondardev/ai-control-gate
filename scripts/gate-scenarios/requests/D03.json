@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Summarize this synthetic credential: sk-SYNTHETICONLY000000000000000000000000000000."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

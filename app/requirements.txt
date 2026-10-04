@@ -1,0 +1,7 @@
+# Runtime dependencies, pinned by version (not by digest yet).
+# psycopg is the PostgreSQL driver; redis is used only for the disposable runtime cache.
+# requirements-mcp.lock pins the MCP SDK and the transitive set verified by the M00 spike; the
+# gate MCP ingress, the dummy MCP services and the scenario client all import it.
+-r requirements-mcp.lock
+psycopg[binary]==3.2.12
+redis==5.2.1

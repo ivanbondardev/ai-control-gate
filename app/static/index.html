@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action Gate console</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="top">
+  <h1>Action Gate <span id="version" class="muted">…</span></h1>
+  <p><a href="/control/">Open the integrated AI Control Panel</a></p>
+  <p class="lede">
+    One protected call: deterministic controls, a reserved semantic check, at most one dispatch to
+    the synthetic target, output controls and a durable audit. Policy changes go through drafts and
+    an explicit activation; the files under <code>app/policy/</code> are the bootstrap format only.
+  </p>
+  <dl class="state" id="state">
+    <div><dt>Storage</dt><dd id="state-storage">…</dd></div>
+    <div><dt>Config source</dt><dd id="state-source">…</dd></div>
+    <div><dt>Active release</dt><dd id="state-release">…</dd></div>
+    <div><dt>Generation</dt><dd id="state-generation">…</dd></div>
+    <div><dt>Detector</dt><dd id="state-detector">…</dd></div>
+    <div><dt>Hash salt</dt><dd id="state-salt">…</dd></div>
+  </dl>
+</header>
+
+<section class="identity" aria-labelledby="identity-heading">
+  <h2 id="identity-heading">Demo identity</h2>
+  <p class="note">
+    Synthetic identities only. They are typed here, kept in this tab's memory and never written to
+    the URL, to storage or to a cookie. A reload forgets them. The agent identity performs calls;
+    the operator identity changes policy. The server checks both requests independently, so hiding
+    a control here proves nothing.
+  </p>
+  <form id="identity-form" autocomplete="off">
+    <label for="agent-principal">Agent principal</label>
+    <input id="agent-principal" name="agent-principal" value="agent-local" spellcheck="false">
+    <label for="agent-token">Agent token</label>
+    <input id="agent-token" name="agent-token" type="password" spellcheck="false">
+    <label for="operator-principal">Operator principal</label>
+    <input id="operator-principal" name="operator-principal" value="operator-local" spellcheck="false">
+    <label for="operator-token">Operator token</label>
+    <input id="operator-token" name="operator-token" type="password" spellcheck="false">
+    <button type="submit">Use these identities</button>
+  </form>
+  <p id="identity-status" class="status" role="status"></p>
+</section>
+
+<nav class="tabs" role="tablist" aria-label="Console sections">
+  <button role="tab" id="tab-playground" aria-controls="panel-playground" aria-selected="true">Playground</button>
+  <button role="tab" id="tab-result" aria-controls="panel-result" aria-selected="false">Result</button>
+  <button role="tab" id="tab-policies" aria-controls="panel-policies" aria-selected="false">Policies</button>
+  <button role="tab" id="tab-dashboard" aria-controls="panel-dashboard" aria-selected="false">Dashboard</button>
+  <button role="tab" id="tab-trace" aria-controls="panel-trace" aria-selected="false">Trace</button>
+</nav>
+
+<main>
+  <section id="panel-playground" role="tabpanel" aria-labelledby="tab-playground">
+    <h2>Playground</h2>
+    <p class="note">
+      A new Run creates a new idempotency key. If a request times out, press
+      <strong>Repeat last request</strong> to send the same key again instead of creating a second
+      action.
+    </p>
+    <form id="run-form" autocomplete="off">
+      <div class="grid">
+        <div>
+          <label for="run-service">Service</label>
+          <select id="run-service"></select>
+        </div>
+        <div>
+          <label for="run-action">Action</label>
+          <select id="run-action"></select>
+        </div>
+        <div>
+          <label for="run-document">Document</label>
+          <select id="run-document">
+            <option value="release-notes">release-notes (public)</option>
+            <option value="handbook">handbook (internal, synthetic PII)</option>
+            <option value="field-report">field-report (poisoned)</option>
+            <option value="security-notes">security-notes (benign neighbour)</option>
+          </select>
+        </div>
+        <div>
+          <label for="run-model">Model tag</label>
+          <input id="run-model" value="demo-local" spellcheck="false">
+          <p class="hint">An allowlist tag checked by policy, not a promise that an LLM is called.</p>
+        </div>
+      </div>
+      <label for="run-text">Text (input or comment body)</label>
+      <textarea id="run-text" rows="4" spellcheck="false"></textarea>
+      <div class="presets" id="presets" role="group" aria-label="Synthetic presets"></div>
+      <div class="actions">
+        <button type="submit" id="run-submit">Run</button>
+        <button type="button" id="run-dry">Dry run</button>
+        <button type="button" id="run-repeat" disabled>Repeat last request</button>
+      </div>
+    </form>
+    <p id="run-status" class="status" role="status"></p>
+    <div id="run-result" class="result" aria-live="polite"></div>
+  </section>
+
+  <section id="panel-result" role="tabpanel" aria-labelledby="tab-result" hidden>
+    <h2>Result</h2>
+    <p class="note">
+      Three answers are shown separately, because they are different questions: what the input
+      decision was, what happened to the action, and what was disclosed from the output.
+      <code>withheld</code> with <code>succeeded</code> is a normal, correct outcome.
+    </p>
+    <div id="result-detail" class="result"></div>
+  </section>
+
+  <section id="panel-policies" role="tabpanel" aria-labelledby="tab-policies" hidden>
+    <h2>Policies</h2>
+    <p class="note">
+      Editing a draft never changes live behaviour. Compare runs the same evaluator an invocation
+      runs, with the target call replaced by nothing; activation requires a current, complete
+      comparison for exactly these hashes and this detector identity.
+    </p>
+    <div id="policy-active" class="card"></div>
+    <div class="actions">
+      <button type="button" id="policy-new-draft">New draft from active</button>
+      <button type="button" id="policy-reload">Reload</button>
+      <button type="button" id="policy-export">Export bundle</button>
+    </div>
+    <p id="policy-status" class="status" role="status"></p>
+    <div id="policy-editor"></div>
+    <div id="policy-history" class="card"></div>
+    <div id="policy-activations" class="card"></div>
+    <details id="policy-import">
+      <summary>Import a bundle</summary>
+      <p class="note">Import stores a draft. It never activates by itself and it never carries credentials.</p>
+      <label for="policy-import-text">Bundle JSON</label>
+      <textarea id="policy-import-text" rows="8" spellcheck="false"></textarea>
+      <button type="button" id="policy-import-button">Import as draft</button>
+    </details>
+  </section>
+
+  <section id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+    <h2>Dashboard</h2>
+    <form id="window-form" class="inline">
+      <label for="window-minutes">Window (minutes)</label>
+      <input id="window-minutes" type="number" min="1" max="43200" value="1440">
+      <button type="submit">Refresh</button>
+    </form>
+    <p class="note">
+      Every counter, dispatch figure and latency number below is computed over the same
+      <code>[since, until)</code> interval in UTC. The daily ledger is a UTC day and is labelled as
+      the shared budget, not as one agent's budget.
+    </p>
+    <div id="dashboard"></div>
+  </section>
+
+  <section id="panel-trace" role="tabpanel" aria-labelledby="tab-trace" hidden>
+    <h2>Trace</h2>
+    <form id="trace-form" class="inline">
+      <label for="trace-id">Invocation ID</label>
+      <input id="trace-id" spellcheck="false" placeholder="00000000-0000-0000-0000-000000000000">
+      <button type="submit">Load trace</button>
+      <button type="button" id="trace-refresh">Load recent list</button>
+    </form>
+    <p id="trace-status" class="status" role="status"></p>
+    <div id="trace-list"></div>
+    <div id="trace-detail" class="result"></div>
+    <details id="audit-export">
+      <summary>Audit export</summary>
+      <p class="note">
+        Exports are bounded pages. When the page is truncated the response carries a cursor and the
+        console says so instead of pretending the export was complete.
+      </p>
+      <button type="button" id="audit-export-button">Fetch one page</button>
+      <pre id="audit-export-output" class="scroll"></pre>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <p class="note">
+    Local demonstration environment: synthetic documents, synthetic identities, an offline
+    heuristic detector by default. The baseline is labelled a baseline everywhere it appears; no
+    page claims it is a trained model.
+  </p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

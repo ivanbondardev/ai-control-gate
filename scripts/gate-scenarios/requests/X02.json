@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Review this untrusted text: os.system(untrusted_command)."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

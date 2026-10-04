@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Review this untrusted text: pickle.loads(untrusted_blob)."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

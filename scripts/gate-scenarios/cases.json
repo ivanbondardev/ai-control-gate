@@ -1,0 +1,551 @@
+[
+  {
+    "id": "L01",
+    "group": "model",
+    "title": "Звичайний дозволений запит",
+    "profile": "baseline",
+    "expect": "response",
+    "evidence": "provider_dispatch, usage, policy snapshot",
+    "request": "requests/L01.json"
+  },
+  {
+    "id": "L02",
+    "group": "model",
+    "title": "Український текст без чутливих даних",
+    "profile": "baseline",
+    "expect": "response",
+    "evidence": "provider_dispatch, usage",
+    "request": "requests/L02.json"
+  },
+  {
+    "id": "L03",
+    "group": "model",
+    "title": "Системна інструкція та історія",
+    "profile": "baseline",
+    "expect": "response",
+    "evidence": "provider_dispatch",
+    "request": "requests/L03.json"
+  },
+  {
+    "id": "L04",
+    "group": "model",
+    "title": "Потокова відповідь",
+    "profile": "baseline",
+    "expect": "stream",
+    "evidence": "output checks before disclosure, terminal usage",
+    "request": "requests/L04.json"
+  },
+  {
+    "id": "A01",
+    "group": "auth",
+    "title": "Відсутня автентифікація",
+    "profile": "baseline",
+    "expect": "unauthorized",
+    "evidence": "zero provider dispatch",
+    "auth": "none",
+    "request": "requests/A01.json"
+  },
+  {
+    "id": "A02",
+    "group": "auth",
+    "title": "Невірний локальний токен",
+    "profile": "baseline",
+    "expect": "unauthorized",
+    "evidence": "zero provider dispatch",
+    "auth": "bad",
+    "request": "requests/A02.json"
+  },
+  {
+    "id": "A03",
+    "group": "auth",
+    "title": "Спроба підміни ролі у тілі",
+    "profile": "baseline",
+    "expect": "invalid",
+    "evidence": "zero provider dispatch; identity from transport",
+    "request": "requests/A03.json"
+  },
+  {
+    "id": "A04",
+    "group": "auth",
+    "title": "Заборонена модель",
+    "profile": "baseline",
+    "expect": "denied",
+    "evidence": "model allowlist; zero provider dispatch",
+    "request": "requests/A04.json"
+  },
+  {
+    "id": "V01",
+    "group": "validation",
+    "title": "Невалідний JSON",
+    "profile": "baseline",
+    "expect": "invalid",
+    "evidence": "zero provider dispatch",
+    "malformed": true,
+    "request": "requests/V01.json"
+  },
+  {
+    "id": "V02",
+    "group": "validation",
+    "title": "Неправильний тип input",
+    "profile": "baseline",
+    "expect": "invalid",
+    "evidence": "zero provider dispatch",
+    "request": "requests/V02.json"
+  },
+  {
+    "id": "V03",
+    "group": "validation",
+    "title": "Невідоме поле запиту",
+    "profile": "baseline",
+    "expect": "invalid",
+    "evidence": "zero provider dispatch",
+    "request": "requests/V03.json"
+  },
+  {
+    "id": "V04",
+    "group": "validation",
+    "title": "Перевищення ліміту тіла",
+    "profile": "body-limit",
+    "expect": "too_large",
+    "evidence": "zero provider dispatch; configured body limit below generated payload",
+    "large": true,
+    "request": "requests/V04.json"
+  },
+  {
+    "id": "D01",
+    "group": "privacy",
+    "title": "PII на вході — redact",
+    "profile": "pii-redact",
+    "expect": "clean",
+    "evidence": "sanitized outbound payload; redact finding before any external call",
+    "forbidden": [
+      "alex.synthetic@example.test",
+      "+48 555 010 123"
+    ],
+    "request": "requests/D01.json"
+  },
+  {
+    "id": "D02",
+    "group": "privacy",
+    "title": "PII на вході — block",
+    "profile": "pii-block",
+    "expect": "denied",
+    "evidence": "zero provider dispatch; pii reason",
+    "request": "requests/D02.json"
+  },
+  {
+    "id": "D03",
+    "group": "privacy",
+    "title": "Синтетичний секрет на вході",
+    "profile": "secret-block",
+    "expect": "denied",
+    "evidence": "zero external dispatch including semantic detector; secret absent from audit",
+    "request": "requests/D03.json"
+  },
+  {
+    "id": "D04",
+    "group": "privacy",
+    "title": "Чутливий вміст на виході",
+    "profile": "output-redact",
+    "expect": "clean",
+    "evidence": "raw upstream contained canary; gate output finding; no canary disclosed",
+    "forbidden": [
+      "alex.synthetic@example.test"
+    ],
+    "request": "requests/D04.json"
+  },
+  {
+    "id": "D05",
+    "group": "privacy",
+    "title": "Чутливий вміст у SSE",
+    "profile": "output-redact",
+    "expect": "stream_clean",
+    "evidence": "raw upstream contained canary; no sensitive prefix or complete value in any SSE event",
+    "forbidden": [
+      "alex.synthetic@example.test"
+    ],
+    "request": "requests/D05.json"
+  },
+  {
+    "id": "D06",
+    "group": "privacy",
+    "title": "Блокування чутливого виходу",
+    "profile": "output-block",
+    "expect": "denied",
+    "evidence": "raw real-provider output contained canary; output policy blocked disclosure; actual provider usage charged; no canary in any client representation",
+    "forbidden": [
+      "alex.synthetic@example.test"
+    ],
+    "request": "requests/D06.json"
+  },
+  {
+    "id": "D07",
+    "group": "privacy",
+    "title": "Блокування чутливого виходу у SSE",
+    "profile": "output-block",
+    "expect": "stream_block",
+    "evidence": "raw real-provider output contained canary; output policy blocked disclosure; actual provider usage charged; no canary in any client representation",
+    "forbidden": [
+      "alex.synthetic@example.test"
+    ],
+    "request": "requests/D07.json"
+  },
+  {
+    "id": "S01",
+    "group": "semantic",
+    "title": "Пряма prompt injection",
+    "profile": "semantic-strict",
+    "expect": "denied",
+    "evidence": "real semantic provider used; semantic verdict before target dispatch",
+    "request": "requests/S01.json"
+  },
+  {
+    "id": "S02",
+    "group": "semantic",
+    "title": "Перефразована prompt injection",
+    "profile": "semantic-strict",
+    "expect": "denied",
+    "evidence": "real semantic provider used; semantic decision, score and configured threshold",
+    "request": "requests/S02.json"
+  },
+  {
+    "id": "S03",
+    "group": "semantic",
+    "title": "Безпечне обговорення атак",
+    "profile": "semantic-strict",
+    "expect": "response",
+    "evidence": "benign labelled case; false-positive check",
+    "request": "requests/S03.json"
+  },
+  {
+    "id": "S04",
+    "group": "semantic",
+    "title": "Непрямий ворожий текст у документі",
+    "profile": "semantic-strict",
+    "expect": "denied",
+    "evidence": "indirect injection finding; zero target dispatch",
+    "request": "requests/S04.json"
+  },
+  {
+    "id": "S05",
+    "group": "semantic",
+    "title": "Недоступний семантичний детектор",
+    "profile": "semantic-unavailable",
+    "expect": "unavailable",
+    "evidence": "semantic unavailable; fail closed; zero target dispatch",
+    "request": "requests/S05.json"
+  },
+  {
+    "id": "X01",
+    "group": "signatures",
+    "title": "Небезпечна десеріалізація",
+    "profile": "signature-feed",
+    "expect": "denied",
+    "evidence": "matching signature ID and feed hash; zero target dispatch",
+    "request": "requests/X01.json"
+  },
+  {
+    "id": "X02",
+    "group": "signatures",
+    "title": "Виконання shell",
+    "profile": "signature-feed",
+    "expect": "denied",
+    "evidence": "matching signature ID and feed hash; zero target dispatch",
+    "request": "requests/X02.json"
+  },
+  {
+    "id": "X03",
+    "group": "signatures",
+    "title": "Сигнатура supply-chain",
+    "profile": "signature-feed",
+    "expect": "denied",
+    "evidence": "matching signature ID and feed hash; zero target dispatch",
+    "request": "requests/X03.json"
+  },
+  {
+    "id": "X04",
+    "group": "signatures",
+    "title": "Контрольний безпечний текст",
+    "profile": "signature-feed",
+    "expect": "response",
+    "evidence": "no signature false positive; provider dispatch",
+    "request": "requests/X04.json"
+  },
+  {
+    "id": "B01",
+    "group": "budget",
+    "title": "Вичерпаний токенний бюджет",
+    "profile": "budget-zero",
+    "expect": "limited",
+    "evidence": "atomic reservation refused; zero paid dispatch",
+    "request": "requests/B01.json"
+  },
+  {
+    "id": "B02",
+    "group": "budget",
+    "title": "Ліміт max_output_tokens",
+    "profile": "output-cap",
+    "expect": "limited",
+    "evidence": "configured cap below 4096; no dispatch or explicitly documented clamp (requires separate expectation)",
+    "request": "requests/B02.json"
+  },
+  {
+    "id": "B03",
+    "group": "budget",
+    "title": "Вичерпаний часовий бюджет",
+    "profile": "deadline-zero",
+    "expect": "deadline",
+    "evidence": "deadline refused before dispatch; output-check time reserved",
+    "request": "requests/B03.json"
+  },
+  {
+    "id": "B04",
+    "group": "budget",
+    "title": "Фінансовий бюджет",
+    "profile": "money-zero",
+    "expect": "limited",
+    "evidence": "pricing version, currency, atomic reservation; no paid dispatch",
+    "request": "requests/B04.json"
+  },
+  {
+    "id": "B05",
+    "group": "budget",
+    "title": "Rate limit",
+    "profile": "rate-exhausted",
+    "expect": "limited",
+    "evidence": "rate window and limit; zero target dispatch",
+    "request": "requests/B05.json"
+  },
+  {
+    "id": "R01",
+    "group": "resilience",
+    "title": "Недоступний реальний провайдер",
+    "profile": "provider-unavailable",
+    "expect": "unavailable",
+    "evidence": "real upstream connection failure; no success fabricated; reservation reconciliation",
+    "request": "requests/R01.json"
+  },
+  {
+    "id": "R02",
+    "group": "resilience",
+    "title": "Відсутній серверний ключ провайдера",
+    "profile": "provider-key-missing",
+    "expect": "unavailable",
+    "evidence": "provider configuration failure; no secret in client error",
+    "request": "requests/R02.json"
+  },
+  {
+    "id": "R03",
+    "group": "resilience",
+    "title": "Недоступний аудит",
+    "profile": "audit-unavailable",
+    "expect": "unavailable",
+    "evidence": "fail closed before dispatch or explicit unknown after dispatch; no silent success",
+    "request": "requests/R03.json"
+  },
+  {
+    "id": "P01",
+    "group": "policy",
+    "title": "Сигнатура до/після зміни фіда",
+    "profile": "feed-before",
+    "expect": "response",
+    "evidence": "policy version/feed hash before activation",
+    "request": "requests/P01.json"
+  },
+  {
+    "id": "P02",
+    "group": "policy",
+    "title": "Сигнатура після активації",
+    "profile": "feed-after",
+    "expect": "denied",
+    "evidence": "new feed hash; matching marker; zero dispatch",
+    "request": "requests/P02.json"
+  },
+  {
+    "id": "P03",
+    "group": "policy",
+    "title": "Сигнатура після rollback",
+    "profile": "feed-rollback",
+    "expect": "response",
+    "evidence": "new activation generation restoring previous content",
+    "request": "requests/P03.json"
+  },
+  {
+    "id": "M01",
+    "group": "mcp",
+    "title": "Каталог інструментів",
+    "profile": "mcp-baseline",
+    "expect": "mcp_catalog",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": null,
+    "arguments": {}
+  },
+  {
+    "id": "M02",
+    "group": "mcp",
+    "title": "Читання документа",
+    "profile": "mcp-baseline",
+    "expect": "mcp_success",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "documents_read",
+    "arguments": {
+      "doc_id": "KB-1042"
+    }
+  },
+  {
+    "id": "M03",
+    "group": "mcp",
+    "title": "Пошук документів",
+    "profile": "mcp-baseline",
+    "expect": "mcp_success",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "documents_search",
+    "arguments": {
+      "query": "reset",
+      "limit": 5
+    }
+  },
+  {
+    "id": "M04",
+    "group": "mcp",
+    "title": "Захищений документ — відмова запису",
+    "profile": "mcp-baseline",
+    "expect": "mcp_denied",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "documents_update",
+    "arguments": {
+      "doc_id": "KB-9000",
+      "content": "Synthetic rewrite.",
+      "expected_version": 1
+    }
+  },
+  {
+    "id": "M05",
+    "group": "mcp",
+    "title": "Внутрішній адресат — локальне збереження",
+    "profile": "mcp-baseline",
+    "expect": "mcp_success",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "outbox_send",
+    "arguments": {
+      "to": "colleague@acme.example",
+      "subject": "Synthetic demo",
+      "body": "The access reset procedure was reviewed."
+    }
+  },
+  {
+    "id": "M06",
+    "group": "mcp",
+    "title": "Зовнішній адресат — відмова",
+    "profile": "mcp-baseline",
+    "expect": "mcp_denied",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "outbox_send",
+    "arguments": {
+      "to": "recipient@external.example",
+      "subject": "Synthetic demo",
+      "body": "Synthetic summary."
+    }
+  },
+  {
+    "id": "M07",
+    "group": "mcp",
+    "title": "Observer — відфільтрований каталог",
+    "profile": "mcp-baseline",
+    "expect": "mcp_catalog_readonly",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": null,
+    "arguments": {},
+    "principal": "observer-agent"
+  },
+  {
+    "id": "M08",
+    "group": "mcp",
+    "title": "Observer — прихований запис",
+    "profile": "mcp-baseline",
+    "expect": "mcp_hidden",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "outbox_send",
+    "arguments": {
+      "to": "colleague@acme.example",
+      "subject": "Synthetic demo",
+      "body": "Synthetic summary."
+    },
+    "principal": "observer-agent"
+  },
+  {
+    "id": "M09",
+    "group": "mcp",
+    "title": "Observer — обмежений документ",
+    "profile": "mcp-baseline",
+    "expect": "mcp_denied",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "documents_read",
+    "arguments": {
+      "doc_id": "KB-RESTRICTED-01"
+    },
+    "principal": "observer-agent"
+  },
+  {
+    "id": "M10",
+    "group": "mcp",
+    "title": "Невідомий інструмент",
+    "profile": "mcp-baseline",
+    "expect": "mcp_hidden",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "not_a_published_tool",
+    "arguments": {}
+  },
+  {
+    "id": "M11",
+    "group": "mcp",
+    "title": "Мутація без operation key",
+    "profile": "mcp-baseline",
+    "expect": "mcp_invalid",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "outbox_send",
+    "arguments": {
+      "to": "colleague@acme.example",
+      "subject": "Synthetic demo",
+      "body": "Synthetic summary."
+    },
+    "omit_key": true
+  },
+  {
+    "id": "M12",
+    "group": "mcp",
+    "title": "PII у документі",
+    "profile": "mcp-baseline",
+    "expect": "mcp_redacted",
+    "evidence": "source canaries absent from both text and structuredContent",
+    "tool": "documents_read",
+    "arguments": {
+      "doc_id": "KB-PII-01"
+    }
+  },
+  {
+    "id": "M13",
+    "group": "mcp",
+    "title": "Prompt injection у документі",
+    "profile": "mcp-semantic-strict",
+    "expect": "mcp_denied",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "documents_read",
+    "arguments": {
+      "doc_id": "KB-INJECT-01"
+    }
+  },
+  {
+    "id": "M14",
+    "group": "mcp",
+    "title": "Створення ticket",
+    "profile": "mcp-baseline",
+    "expect": "mcp_success",
+    "evidence": "operation ID, service receipt and independent service state",
+    "tool": "tickets_create",
+    "arguments": {
+      "title": "Synthetic access request",
+      "description": "Please review the synthetic access request."
+    }
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "principals": [
+    {
+      "id": "agent-local",
+      "role": "agent",
+      "token": "local-agent-token",
+      "description": "Local synthetic agent identity. Role comes from this registry, never from the request body."
+    },
+    {
+      "id": "operator-local",
+      "role": "operator",
+      "token": "local-operator-token",
+      "description": "Local synthetic operator identity. There is no HTTP endpoint that grants this role."
+    },
+    {
+      "id": "support-agent",
+      "role": "agent",
+      "token": "local-support-agent-token",
+      "description": "MCP demonstration client. Local synthetic placeholder token: never reuse it outside a local stack. Its id is the policy subject for the granted document, outbox and ticket rules."
+    },
+    {
+      "id": "observer-agent",
+      "role": "agent",
+      "token": "local-observer-agent-token",
+      "description": "Second MCP demonstration client. Local synthetic placeholder token. Its catalog is narrower: no write rule matches its subject."
+    }
+  ]
+}

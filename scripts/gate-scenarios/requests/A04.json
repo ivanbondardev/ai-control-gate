@@ -1,0 +1,12 @@
+{
+  "model": "gate-test-denied-model",
+  "input": [
+    {
+      "role": "user",
+      "content": "Reply with one short greeting."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "default": "baseline-offline-v1",
+  "profiles": [
+    {
+      "id": "baseline-offline-v1",
+      "mode": "baseline",
+      "detector": "baseline-offline",
+      "instructionVersion": 1,
+      "description": "Deterministic offline semantic baseline. It scores known risk cues and is honest about being a baseline, not a trained model."
+    },
+    {
+      "id": "provider-chat-v1",
+      "mode": "provider",
+      "detector": "openai-compatible-chat",
+      "provider": "openai-compatible",
+      "model": "local-unset",
+      "baseUrlEnv": "DETECTOR_PROVIDER_BASE_URL",
+      "apiKeyEnv": "DETECTOR_PROVIDER_API_KEY",
+      "modelEnv": "DETECTOR_PROVIDER_MODEL",
+      "timeoutEnv": "DETECTOR_PROVIDER_TIMEOUT_MS",
+      "instructionVersion": 1,
+      "maxResponseBytes": 8192,
+      "description": "Opt-in adapter for an OpenAI-compatible chat endpoint. Disabled until base URL, model and key are supplied through the environment; it is never enabled by request data."
+    }
+  ]
+}

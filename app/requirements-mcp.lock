@@ -1,0 +1,29 @@
+# MCP protocol dependency lock — verified by the M00 spike on 2026-10-03.
+#
+# Verification record: docs/22-mcp-implementation-handoff.md (Ukrainian) and
+# app/contracts/mcp-protocol-profile.md (English profile contract).
+#
+# Direct dependency, pinned exactly. The versions below it are the transitive set that the
+# spike resolved inside the checked-in Python image; they are pinned so a rebuild reproduces
+# the smoke result instead of silently drifting.
+mcp==2.3.0
+mcp-types==2.3.0
+anyio==4.15.1
+attrs==26.1.0
+click==8.5.0
+h11==0.16.0
+httpcore2==2.13.1
+httpx2==2.13.1
+idna==3.20
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+pydantic==2.13.5
+pydantic_core==2.46.5
+python-multipart==0.0.32
+referencing==0.37.0
+rpds-py==2026.6.3
+sse-starlette==3.5.0
+starlette==1.7.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+uvicorn==0.54.0

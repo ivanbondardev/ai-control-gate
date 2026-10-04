@@ -1,0 +1,27 @@
+# Traefik expands these environment variables in its dynamic file provider.
+http:
+  routers:
+    action-gate:
+      entryPoints:
+        - web
+      rule: 'Host(`{{ env "APP_HOST" }}`) || Host(`localhost`) || Host(`127.0.0.1`)'
+      service: action-gate-api
+    # The MCP ingress is matched by path only, with an explicit priority above the API catch-all.
+    # It does not depend on a host name so the same rule works from the host (127.0.0.1) and from a
+    # container on the edge network. Identity is enforced by the ingress itself with the shared
+    # principal registry; an unauthenticated request is answered 401 before the MCP transport runs.
+    action-gate-mcp:
+      entryPoints:
+        - web
+      rule: 'Path(`/mcp`)'
+      service: action-gate-mcp
+      priority: 100
+  services:
+    action-gate-api:
+      loadBalancer:
+        servers:
+          - url: 'http://api:{{ env "APP_PORT" }}'
+    action-gate-mcp:
+      loadBalancer:
+        servers:
+          - url: 'http://gate-mcp:{{ env "APP_MCP_PORT" }}'

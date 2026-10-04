@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "id": "document-desk",
+      "description": "Synthetic local document service. The only target of controlled dispatch in this release; it performs no network calls.",
+      "actions": [
+        {
+          "id": "documents.read",
+          "effect": "read",
+          "grants": ["agent", "operator"],
+          "description": "Return a synthetic document body. Output passes the same content controls as input."
+        },
+        {
+          "id": "documents.comment",
+          "effect": "write",
+          "grants": ["agent", "operator"],
+          "description": "Append a comment to a synthetic document."
+        },
+        {
+          "id": "documents.delete",
+          "effect": "destructive",
+          "grants": ["operator"],
+          "description": "Delete a synthetic document. Not granted to the agent role."
+        }
+      ]
+    }
+  ]
+}

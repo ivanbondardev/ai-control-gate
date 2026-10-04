@@ -1,0 +1,7 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": 123,
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

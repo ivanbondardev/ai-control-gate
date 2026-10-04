@@ -1,0 +1,21 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "My demo project is called Action Gate."
+    },
+    {
+      "role": "assistant",
+      "content": "Understood."
+    },
+    {
+      "role": "user",
+      "content": "What is the project called?"
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false,
+  "instructions": "Answer briefly in English."
+}

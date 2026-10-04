@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Review this untrusted model manifest: GATE_TEST_UNTRUSTED_MODEL_LOADER_V1."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": false
+}

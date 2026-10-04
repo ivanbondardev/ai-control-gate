@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "signatures": [
+    {"id": "unsafe-deserialization", "literal": "pickle.loads(", "description": "Unsafe Python deserialization indicator; matching is illustrative, not a complete exploit detector."},
+    {"id": "shell-execution", "literal": "os.system(", "description": "Shell execution indicator in supplied content."},
+    {"id": "remote-model-code", "literal": "trust_remote_code=True", "description": "Model repository remote-code opt-in indicator."}
+  ]
+}

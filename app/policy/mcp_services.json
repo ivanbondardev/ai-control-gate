@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "note": "Bootstrap allowlist for the dummy MCP services. Only a connection listed here can be discovered and published. Endpoints are compose-internal names, never values typed into a form, and every published tool needs an operator-reviewed description.",
+  "services": [
+    {
+      "service_id": "documents",
+      "connection_ref": "documents-mcp",
+      "endpoint": "http://documents-mcp:8020/mcp",
+      "status_endpoint": "http://documents-mcp:8020/operations",
+      "credential_id": "gate-mcp",
+      "tools": [
+        {
+          "published_name": "documents_search",
+          "upstream_name": "search_documents",
+          "panel_service": "demo_documents",
+          "panel_action": "search",
+          "reviewed_description": "Search synthetic knowledge-base documents. Returns document ids and titles only; each result is filtered again against the caller's read permission.",
+          "mutation": false,
+          "result_projection": {
+            "kind": "filter_by_access",
+            "list_field": "results",
+            "item_field": "doc_id",
+            "panel_action": "read"
+          }
+        },
+        {
+          "published_name": "documents_read",
+          "upstream_name": "read_document",
+          "panel_service": "demo_documents",
+          "panel_action": "read",
+          "reviewed_description": "Read one synthetic knowledge-base document, including its current version. The result is subject to the same content controls as a model answer.",
+          "mutation": false
+        },
+        {
+          "published_name": "documents_update",
+          "upstream_name": "update_document",
+          "panel_service": "demo_documents",
+          "panel_action": "update",
+          "reviewed_description": "Replace the content of one synthetic document. The version must match expected_version, and the operation is idempotent per client operation key.",
+          "mutation": true
+        }
+      ]
+    },
+    {
+      "service_id": "outbox",
+      "connection_ref": "outbox-mcp",
+      "endpoint": "http://outbox-mcp:8020/mcp",
+      "status_endpoint": "http://outbox-mcp:8020/operations",
+      "credential_id": "gate-mcp",
+      "tools": [
+        {
+          "published_name": "outbox_send",
+          "upstream_name": "send_message",
+          "panel_service": "demo_outbox",
+          "panel_action": "send",
+          "reviewed_description": "Store one message in the local synthetic mailbox. Nothing is delivered anywhere: the stored status is stored_locally.",
+          "mutation": true
+        },
+        {
+          "published_name": "outbox_get",
+          "upstream_name": "get_message",
+          "panel_service": "demo_outbox",
+          "panel_action": "get",
+          "reviewed_description": "Read one stored message. A caller can only read messages it created itself.",
+          "mutation": false
+        },
+        {
+          "published_name": "outbox_list",
+          "upstream_name": "list_messages",
+          "panel_service": "demo_outbox",
+          "panel_action": "list",
+          "reviewed_description": "List metadata of the caller's own stored messages. Message bodies are never included in a listing.",
+          "mutation": false
+        }
+      ]
+    },
+    {
+      "service_id": "tickets",
+      "connection_ref": "tickets-mcp",
+      "endpoint": "http://tickets-mcp:8020/mcp",
+      "status_endpoint": "http://tickets-mcp:8020/operations",
+      "credential_id": "gate-mcp",
+      "tools": [
+        {
+          "published_name": "tickets_create",
+          "upstream_name": "create_ticket",
+          "panel_service": "demo_tickets",
+          "panel_action": "create",
+          "reviewed_description": "Create a synthetic support ticket in the open state.",
+          "mutation": true
+        },
+        {
+          "published_name": "tickets_read",
+          "upstream_name": "read_ticket",
+          "panel_service": "demo_tickets",
+          "panel_action": "read",
+          "reviewed_description": "Read one synthetic ticket, including its status and version.",
+          "mutation": false
+        },
+        {
+          "published_name": "tickets_transition",
+          "upstream_name": "transition_ticket",
+          "panel_service": "demo_tickets",
+          "panel_action": "transition",
+          "reviewed_description": "Move a ticket to its next supported status. The service accepts only open -> in_progress -> resolved, independently of the Gate policy.",
+          "mutation": true
+        }
+      ]
+    }
+  ]
+}

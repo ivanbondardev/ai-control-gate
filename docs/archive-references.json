@@ -1,0 +1,286 @@
+[
+  {
+    "file": "CHANGELOG.md",
+    "target": "docs/19-swe-implementation-plan.md"
+  },
+  {
+    "file": "CHANGELOG.md",
+    "target": "sources/release-0.1.0-request-2026-10-03.md"
+  },
+  {
+    "file": "CHANGELOG.md",
+    "target": "docs/18-release-0.1.0-handoff.md"
+  },
+  {
+    "file": "CHANGELOG.md",
+    "target": "sources/release-0.0.1-request-2026-10-03.md"
+  },
+  {
+    "file": "CHANGELOG.md",
+    "target": "sources/release-0.0.1-request-2026-10-03.md#уточнення-власника-порт-80"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/17-release-0.0.1-handoff.md"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/18-release-0.1.0-handoff.md"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/20-release-0.2.0-handoff.md"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/21-dummy-mcp-implementation-plan.md"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/22-mcp-implementation-handoff.md"
+  },
+  {
+    "file": "app/README.md",
+    "target": "../docs/20-release-0.2.0-handoff.md"
+  },
+  {
+    "file": "app/contracts/README.md",
+    "target": "../../dummy_mcp/common/service.py"
+  },
+  {
+    "file": "app/contracts/README.md",
+    "target": "../../dummy_mcp/"
+  },
+  {
+    "file": "app/contracts/README.md",
+    "target": "../../docs/18-release-0.1.0-handoff.md"
+  },
+  {
+    "file": "app/contracts/control-panel.md",
+    "target": "../../ai-control-layer/"
+  },
+  {
+    "file": "app/docs/structure.md",
+    "target": "../../docs/19-swe-implementation-plan.md"
+  },
+  {
+    "file": "app/docs/structure.md",
+    "target": "../../docs/20-release-0.2.0-handoff.md"
+  },
+  {
+    "file": "docs/07-open-questions.md",
+    "target": "08-session-log.md"
+  },
+  {
+    "file": "docs/07-open-questions.md",
+    "target": "16-mvp-architecture-roast.md"
+  },
+  {
+    "file": "docs/07-open-questions.md",
+    "target": "../sources/mentor-feedback-2026-10-03.md"
+  },
+  {
+    "file": "docs/07-open-questions.md",
+    "target": "21-dummy-mcp-implementation-plan.md"
+  },
+  {
+    "file": "docs/07-open-questions.md",
+    "target": "22-mcp-implementation-handoff.md"
+  },
+  {
+    "file": "infra/postgres/init/README.md",
+    "target": "../../../sources/release-0.0.1-request-2026-10-03.md"
+  },
+  {
+    "file": "pitch/pitch-lines.md",
+    "target": "../talks/mcp-and-ai-agents/synthesis.md"
+  },
+  {
+    "file": "scripts/gate-scenarios/README.md",
+    "target": "../../sources/operator-manual-report-2026-10-04.md"
+  },
+  {
+    "file": "sources/goldman-task/README.md",
+    "target": "../../docs/02-project-action-gate.md"
+  },
+  {
+    "file": "sources/goldman-task/README.md",
+    "target": "../../docs/04-goldman-hypotheses.md"
+  },
+  {
+    "file": "sources/goldman-task/README.md",
+    "target": "../../docs/08-session-log.md"
+  },
+  {
+    "file": "sources/goldman-task/notes/README.md",
+    "target": "../../../docs/02-project-action-gate.md"
+  },
+  {
+    "file": "sources/goldman-task/notes/README.md",
+    "target": "../../../docs/08-session-log.md"
+  },
+  {
+    "file": "sources/goldman-task/notes/task-analysis-2026-10-03.md",
+    "target": "../../../sources/event-context.md"
+  },
+  {
+    "file": "sources/goldman-task/notes/task-analysis-2026-10-03.md",
+    "target": "../../../app/action_gate/models.py#L38-L43"
+  },
+  {
+    "file": "sources/goldman-task/notes/task-analysis-2026-10-03.md",
+    "target": "../../../docs/04-goldman-hypotheses.md"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-review-2026-10-04.md"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance.log"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/unit.log"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/postgres-tests.log"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance.log"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/o.json"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/f2.json"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/late-dispatch.json"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/acceptance/p-after-reset.json"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/local-smoke.json"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/local-health.txt"
+  },
+  {
+    "file": "sources/mcp-fixes-2026-10-04.md",
+    "target": "mcp-fixes-2026-10-04/local-update.log"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "model-proxy-check-2026-10-04.md"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/model-proxy-2026-10-04/activation.json"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/model-proxy-2026-10-04/deadline-activation.json"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/model-proxy-2026-10-04/final-tests.log"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/model-proxy-2026-10-04/verified-audit.json"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/gate-scenarios/20261003T235931Z-54065-14928/"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/gate-scenarios/20261004T000339Z-55260-8039/L02/"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/gate-scenarios/20261004T000412Z-55411-24411/D01/"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/gate-scenarios/20261004T000418Z-55489-15069/D03/"
+  },
+  {
+    "file": "sources/model-proxy-implementation-2026-10-04.md",
+    "target": "../evidence/gate-scenarios/20261004T000248Z-55003-20986/"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-manual-report-2026-10-04.md"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/browser/08-throttle-no-received-payload.png"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/verification.json"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/unit-http.log"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/postgres.log"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/browser.log"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/report-day/management/response.body"
+  },
+  {
+    "file": "sources/operator-fixes-2026-10-04.md",
+    "target": "operator-fixes-2026-10-04/runtime-state.json"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "frontend-integration-2026-10-03.md"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/unit.log"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/postgres.log"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/browser.log"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/deploy.log"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/ready.json"
+  },
+  {
+    "file": "sources/original-panel-integration-2026-10-03.md",
+    "target": "original-panel-checks-2026-10-03/08-live-postgres.png"
+  }
+]

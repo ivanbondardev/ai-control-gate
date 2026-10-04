@@ -1,0 +1,50 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / build
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local secrets and overrides (not committed to the repository)
+.env
+.env.*
+!.env.example
+*.local
+secrets.*
+credentials.*
+secrets/
+evidence/
+
+# Generated snapshots of UI checks (make ui-check / control-ui-check)
+.ui-shots/
+
+# Subprocess working directories in the transcript library
+talks/**/_wrap/
+talks/**/*.tmp
+
+# Temporary transcript line wraps (fold) during bulk parsing of talks/
+.talk-tmp/

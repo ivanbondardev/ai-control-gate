@@ -1,0 +1,396 @@
+services:
+  traefik:
+    image: ${TRAEFIK_IMAGE:?Run make init first}
+    command:
+      - --entrypoints.web.address=:80
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --ping=true
+      - --log.level=${TRAEFIK_LOG_LEVEL:-INFO}
+      - --global.checknewversion=false
+      - --global.sendanonymoususage=false
+    environment:
+      APP_HOST: ${APP_HOST:?Set APP_HOST in .env}
+      APP_PORT: ${APP_PORT:-8000}
+      APP_MCP_PORT: ${APP_MCP_PORT:-8010}
+    ports:
+      - "127.0.0.1:${TRAEFIK_HTTP_PORT:-80}:80"
+    volumes:
+      - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, traefik, healthcheck, --ping]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - edge
+    restart: unless-stopped
+
+  # One migration job with an advisory lock. The API and the MCP ingress wait for it and never run
+  # migrations themselves, so a second process cannot race the same schema.
+  migrate:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    command: ["python", "-m", "action_gate.migrate"]
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: "no"
+
+  api:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    environment:
+      APP_VERSION: ${APP_VERSION:-0.2.0}
+      APP_ENV: ${APP_ENV:-local}
+      APP_BIND: ${APP_BIND:-0.0.0.0}
+      APP_PORT: ${APP_PORT:-8000}
+      APP_STORAGE: ${APP_STORAGE:-postgres}
+      APP_RUNTIME_CACHE: ${APP_RUNTIME_CACHE:-redis}
+      APP_DB_POOL_SIZE: ${APP_DB_POOL_SIZE:-8}
+      APP_HASH_SALT: ${APP_HASH_SALT:?Set APP_HASH_SALT in .env}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DB: ${REDIS_DB:-0}
+      # Opt-in semantic provider. Empty values keep the detector profile unavailable, which the
+      # policy treats as a failed mandatory check, not as an allow.
+      DETECTOR_PROVIDER_BASE_URL: ${DETECTOR_PROVIDER_BASE_URL:-}
+      DETECTOR_PROVIDER_API_KEY: ${DETECTOR_PROVIDER_API_KEY:-}
+      DETECTOR_PROVIDER_MODEL: ${DETECTOR_PROVIDER_MODEL:-}
+      DETECTOR_PROVIDER_TIMEOUT_MS: ${DETECTOR_PROVIDER_TIMEOUT_MS:-8000}
+      # Responses proxy uses this server-side key, or the already configured detector key.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      MODEL_PROXY_DETECTOR_PROFILE: ${MODEL_PROXY_DETECTOR_PROFILE:-}
+      # Operator tooling (mcp_bootstrap) runs from this container too.
+      DEMO_CREDENTIALS_FILE: /run/demo/credentials.json
+      APP_MCP_ALLOWED_HOSTS: ${APP_MCP_ALLOWED_HOSTS:-documents-mcp,outbox-mcp,tickets-mcp}
+    volumes:
+      # Configuration is re-read per invocation so an operator can edit it live. Read-only: the
+      # gate can never rewrite its own policy from inside the container.
+      - ./app/policy:/app/policy:ro
+      # Generated local service credentials, mounted read-only and never committed.
+      - ./secrets:/run/demo:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ['APP_PORT'] + '/health/live', timeout=2).close()"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - edge
+      - backend
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  # Client-facing MCP ingress and the only owner of network dispatch in this slice. It holds the
+  # client registry through the shared identity resolver, reads the panel policy row without a write
+  # lock and keeps every service credential in its own read-only mount.
+  gate-mcp:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    command: ["python", "-m", "action_gate.mcp_server"]
+    environment:
+      APP_VERSION: ${APP_VERSION:-0.2.0}
+      APP_ENV: ${APP_ENV:-local}
+      APP_PORT: ${APP_MCP_PORT:-8010}
+      APP_MCP_PORT: ${APP_MCP_PORT:-8010}
+      APP_STORAGE: ${APP_STORAGE:-postgres}
+      APP_DB_POOL_SIZE: ${APP_MCP_DB_POOL_SIZE:-8}
+      APP_HASH_SALT: ${APP_HASH_SALT:?Set APP_HASH_SALT in .env}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      DEMO_CREDENTIALS_FILE: /run/demo/credentials.json
+      # The scenario client runs inside this container, so it reaches Traefik by service name.
+      DEMO_MCP_ENDPOINT: ${DEMO_MCP_ENDPOINT:-http://traefik/mcp}
+      APP_MCP_ALLOWED_HOSTS: ${APP_MCP_ALLOWED_HOSTS:-documents-mcp,outbox-mcp,tickets-mcp}
+    volumes:
+      - ./app/policy:/app/policy:ro
+      - ./secrets:/run/demo:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ['APP_MCP_PORT'] + '/health/ready', timeout=2).close()"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - edge
+      - backend
+      - documents_net
+      - outbox_net
+      - tickets_net
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  # One-off volume preparation: named volumes are created root-owned, and every service runs as a
+  # non-root user. Only the three demo volumes are touched, and nothing is made world-writable.
+  demo-volumes-init:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    profiles: ["demo-mcp"]
+    user: "0:0"
+    command:
+      - sh
+      - -c
+      - "chown 10001:10001 /data/documents /data/outbox /data/tickets && chmod 700 /data/documents /data/outbox /data/tickets"
+    volumes:
+      - documents_data:/data/documents
+      - outbox_data:/data/outbox
+      - tickets_data:/data/tickets
+    network_mode: none
+    restart: "no"
+
+  documents-mcp:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    profiles: ["demo-mcp"]
+    command: ["python", "-m", "dummy_mcp", "documents"]
+    environment:
+      DEMO_SERVICE: documents
+      DEMO_DB_DIR: /data
+      DEMO_DB_PATH: /data/documents.sqlite3
+      DEMO_CREDENTIALS_FILE: /run/demo/credentials.json
+    volumes:
+      - documents_data:/data
+      - ./secrets:/run/demo:ro
+    depends_on:
+      demo-volumes-init:
+        condition: service_completed_successfully
+    networks:
+      - documents_net
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/health/ready', timeout=2).close()"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  outbox-mcp:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    profiles: ["demo-mcp"]
+    command: ["python", "-m", "dummy_mcp", "outbox"]
+    environment:
+      DEMO_SERVICE: outbox
+      DEMO_DB_DIR: /data
+      DEMO_DB_PATH: /data/outbox.sqlite3
+      DEMO_CREDENTIALS_FILE: /run/demo/credentials.json
+    volumes:
+      - outbox_data:/data
+      - ./secrets:/run/demo:ro
+    depends_on:
+      demo-volumes-init:
+        condition: service_completed_successfully
+    networks:
+      - outbox_net
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/health/ready', timeout=2).close()"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  # The third service is optional on purpose: an unavailable Tickets container must not make the
+  # Gate unready, and the main demonstration runs with Documents and Outbox alone.
+  tickets-mcp:
+    image: action-gate-api:${APP_VERSION:-0.2.0}
+    build:
+      context: ./app
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:?Set PYTHON_IMAGE in .env}
+        APP_VERSION: ${APP_VERSION:-0.2.0}
+    profiles: ["demo-mcp"]
+    command: ["python", "-m", "dummy_mcp", "tickets"]
+    environment:
+      DEMO_SERVICE: tickets
+      DEMO_DB_DIR: /data
+      DEMO_DB_PATH: /data/tickets.sqlite3
+      DEMO_CREDENTIALS_FILE: /run/demo/credentials.json
+    volumes:
+      - tickets_data:/data
+      - ./secrets:/run/demo:ro
+    depends_on:
+      demo-volumes-init:
+        condition: service_completed_successfully
+    networks:
+      - tickets_net
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/health/ready', timeout=2).close()"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  postgres:
+    image: ${POSTGRES_IMAGE:?Set POSTGRES_IMAGE in .env}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - backend
+    restart: unless-stopped
+
+  redis:
+    image: ${REDIS_IMAGE:?Set REDIS_IMAGE in .env}
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-128mb}
+      - --maxmemory-policy
+      - noeviction
+    tmpfs:
+      - /data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  edge:
+  backend:
+    internal: true
+  # One network per dummy service. They are internal (no route out of the host) and are deliberately
+  # not shared: a documents container cannot address the outbox container.
+  documents_net:
+    internal: true
+  outbox_net:
+    internal: true
+  tickets_net:
+    internal: true
+
+volumes:
+  postgres_data:
+  documents_data:
+  outbox_data:
+  tickets_data:

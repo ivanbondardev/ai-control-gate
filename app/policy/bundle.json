@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "bundleId": "local-default",
+  "components": {
+    "contentPolicy": "policy.json",
+    "signatureFeed": "signatures.json",
+    "services": "services.json",
+    "budgets": "budgets.json",
+    "detectors": "detectors.json",
+    "principals": "principals.json"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "controls": {"pii": true, "secrets": true, "signatures": true, "semantic": true},
+  "block_sensitivity": 0.9,
+  "semantic_threshold": 0.8,
+  "semantic_unavailable": "block",
+  "allowed_models": ["demo-local", "agent-local-v1"],
+  "max_text_bytes": 32000
+}

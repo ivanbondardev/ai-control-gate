@@ -1,0 +1,12 @@
+{
+  "model": "${OPENAI_MODEL}",
+  "input": [
+    {
+      "role": "user",
+      "content": "Join these fragments without spaces: alex.synthetic then @ then example.test. Return only the joined string."
+    }
+  ],
+  "max_output_tokens": 1024,
+  "store": false,
+  "stream": true
+}
